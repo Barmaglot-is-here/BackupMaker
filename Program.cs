@@ -140,7 +140,7 @@ namespace BackupMaker
         {
             foreach (var file in Directory.EnumerateFiles(directory))
             {
-                if (ignore.IsIgnored(file, Gitignore.PathType.File))
+                if (ignore.IsIgnored(file))
                 {
                     Logger.WriteLine(file + " --ignored");
 
@@ -173,7 +173,7 @@ namespace BackupMaker
         {
             foreach (var subdirectory in Directory.EnumerateDirectories(directory))
             {
-                if (ignore.IsIgnored(subdirectory, Gitignore.PathType.Directory))
+                if (ignore.IsIgnored(subdirectory))
                 {
                     Logger.WriteLine(subdirectory + " --ignored");
 

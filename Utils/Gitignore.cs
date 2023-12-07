@@ -4,12 +4,6 @@
     {
         public static Gitignore Empty { get; } = new Gitignore(Array.Empty<string>());
 
-        public enum PathType
-        {
-            File,
-            Directory,
-        }
-
         private IEnumerable<string> _excludeList;
 
         internal Gitignore(IEnumerable<string> excludeList)
@@ -29,6 +23,7 @@
                 string line = reader.ReadLine()!;
 
                 line = line.Replace("/", "\\");
+                line = line.Replace("*", "");
 
                 excludeList.Enqueue(line);
             }
@@ -38,17 +33,13 @@
             return new Gitignore(excludeList);
         }
 
-        public bool IsIgnored(string path, PathType type)
+        public bool IsIgnored(string path)
         {
             if (_excludeList.Count() == 0)
                 return false;
 
-            if (type == PathType.File)
-                path = Path.GetFileName(path);
-
-
             foreach (string exclude in _excludeList)
-                if (path.Contains(exclude))
+                if (path.EndsWith(exclude))
                     return true;
 
             return false;
