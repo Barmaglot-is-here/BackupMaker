@@ -15,9 +15,9 @@ namespace BackupMaker
                 {
                     _owerwritingConfirmed = true;
 
-                    Logger.WriteLine();
+                    ExtendedConsole.WriteLine();
                     _isOverwritingAllowed = Confirm("Directory contains duplicate files. Allow owerwriting?");
-                    Logger.WriteLine();
+                    ExtendedConsole.WriteLine();
                 }
 
                 return _isOverwritingAllowed;
@@ -26,27 +26,29 @@ namespace BackupMaker
 
         static void Main(string[] args)
         {
-            ParseArgs(args);
             EncodingSetter.Set(1251);
 
             while (true)
             {
-                string startFolder = GetPath("Enter start folder:", false);
-                string destinationFolder = GetPath("Enter destination folder:", true);
+                Configuration config = Congfigure();
 
                 if (!Confirm("Configuration is complete. Begin?"))
-                    break;
+                    continue;
+
+                string destinationFolder = config.CreateTopFolderToo
+                    ? CreateTopLevelFolder(config.StartFolder, config.DestinationFolder)
+                    : config.DestinationFolder;
 
                 try
                 {
-                    MakeBackup(startFolder, destinationFolder);
+                    MakeBackup(config.StartFolder, destinationFolder);
                 }
                 catch (Exception ex)
                 {
-                    if (!Logger.IsLoggingEnabled)
-                        Logger.EnableLogging();
+                    if (!ExtendedConsole.IsLoggingEnabled)
+                        ExtendedConsole.EnableLogging();
 
-                    Logger.WriteErrorLine(ex.ToString());
+                    ExtendedConsole.WriteErrorLine(ex.ToString());
 
                     break;
                 }
@@ -57,22 +59,31 @@ namespace BackupMaker
                     break;
             }
 
-            Logger.OnExit();
+            ExtendedConsole.OnExit();
         }
 
-        private static void ParseArgs(string[] args)
+        private static Configuration Congfigure()
         {
-            if (args.Contains("-log"))
-                Logger.EnableLogging();
+            string startFolder = GetPath("Enter start folder:", false);
+            string destinationFolder = GetPath("Enter destination folder:", true);
+            bool createTopFolderToo = Confirm("Create top level folder?");
+
+            if (Confirm("Enable console output?"))
+                ExtendedConsole.EnableOutput();
+
+            if (Confirm("Enable logging?"))
+                ExtendedConsole.EnableLogging();
+
+            return new Configuration(startFolder, destinationFolder, createTopFolderToo);
         }
 
         private static string GetPath(string msg, bool createIfDoesntExists)
         {
             while (true)
             {
-                Logger.WriteLine(msg);
+                ExtendedConsole.WriteLine(msg);
 
-                string path = Logger.ReadLine() ?? string.Empty;
+                string path = ExtendedConsole.ReadLine() ?? string.Empty;
 
                 if (!Directory.Exists(path))
                     if (createIfDoesntExists)
@@ -84,12 +95,12 @@ namespace BackupMaker
                     }
                     else
                     {
-                        Logger.WriteLine("directory doesn't exists");
+                        ExtendedConsole.WriteLine("directory doesn't exists");
 
                         continue;
                     }
 
-                Logger.WriteLine("Ok");
+                ExtendedConsole.WriteLine("Ok");
 
                 return path;
             }
@@ -99,26 +110,36 @@ namespace BackupMaker
         {
             while (true)
             {
-                Logger.WriteLine($"{msg} [Y/N]");
+                ExtendedConsole.WriteLine($"{msg} [Y/N]");
 
-                var key = Logger.ReadKey(true);
+                var keyInfo = ExtendedConsole.ReadKey(true);
 
-                if (key.KeyChar == 'Y' || key.KeyChar == 'y')
+                if (keyInfo.Key == ConsoleKey.Y)
                     return true;
-                else if (key.KeyChar == 'N' || key.KeyChar == 'n')
+                else if (keyInfo.Key == ConsoleKey.N)
                     return false;
 
-                Logger.WriteLine("Wrong key");
+                ExtendedConsole.WriteLine("Wrong key");
             }
+        }
+
+        private static string CreateTopLevelFolder(string startFolder, string destinationFolder)
+        {
+            string topLevelFolder = Path.GetDirectoryName(startFolder)!;
+            destinationFolder += topLevelFolder;
+
+            Directory.CreateDirectory(destinationFolder);
+
+            return destinationFolder;
         }
 
         private static void MakeBackup(string startFolder, string destinationFolder)
         {
-            Logger.WriteLine("\n-----------------------Start-----------------------");
+            ExtendedConsole.WriteLine("\n-----------------------Start-----------------------");
 
             DeepCopy(startFolder, destinationFolder, Gitignore.Empty);
 
-            Logger.WriteLine("-----------------------Done-----------------------\n");
+            ExtendedConsole.WriteLine("-----------------------Done-----------------------\n");
         }
 
         private static void DeepCopy(string directory, string copyTo, Gitignore ignore)
@@ -142,7 +163,7 @@ namespace BackupMaker
             {
                 if (ignore.IsIgnored(file))
                 {
-                    Logger.WriteLine(file + " --ignored");
+                    ExtendedConsole.WriteLine(file + " --ignored");
 
                     continue;
                 }
@@ -155,16 +176,16 @@ namespace BackupMaker
                     {
                         File.Copy(file, finalPath, true);
 
-                        Logger.WriteLine(file + " --owerwrited");
+                        ExtendedConsole.WriteLine(file + " --owerwrited");
                     }
                     else
-                        Logger.WriteLine(file + " --skiped");
+                        ExtendedConsole.WriteLine(file + " --skiped");
                 }
                 else
                 {
                     File.Copy(file, finalPath);
 
-                    Logger.WriteLine(file);
+                    ExtendedConsole.WriteLine(file);
                 }
             }
         }
@@ -175,7 +196,7 @@ namespace BackupMaker
             {
                 if (ignore.IsIgnored(subdirectory))
                 {
-                    Logger.WriteLine(subdirectory + " --ignored");
+                    ExtendedConsole.WriteLine(subdirectory + " --ignored");
 
                     continue;
                 }
@@ -184,7 +205,7 @@ namespace BackupMaker
 
                 Directory.CreateDirectory(finalPath);
 
-                Logger.WriteLine(subdirectory);
+                ExtendedConsole.WriteLine(subdirectory);
 
                 DeepCopy(subdirectory, finalPath, ignore);
             }

@@ -1,6 +1,6 @@
 ﻿namespace BackupMaker.Utils
 {
-    internal static class Logger
+    internal static class ExtendedConsole
     {
         private const string LOG_DATE_FORMAT = "yyyy_MM_dd-hh_mm_ss";
         private const string LOG_EXTENSION = ".log";
@@ -8,10 +8,17 @@
         private static Queue<string>? _log;
 
         public static bool IsLoggingEnabled { get; private set; }
+        public static bool IsOutputEnabled { get; private set; }
+
+        public static void EnableOutput()
+        {
+            IsOutputEnabled = true;
+        }
 
         public static void EnableLogging()
         {
-            _log = new Queue<string>();
+            if (!IsLoggingEnabled)
+                _log = new Queue<string>();
 
             IsLoggingEnabled = true;
         }
@@ -65,9 +72,10 @@
 
             Console.WriteLine("Log saving...");
 
-            SaveLog(_log, Directory.GetCurrentDirectory());
+            var saveFolder = Directory.GetCurrentDirectory();
+            SaveLog(_log, saveFolder);
 
-            Console.WriteLine($"Done. Saved at: {"tets"}\n");
+            Console.WriteLine($"Done. Saved at: {saveFolder}\n");
         }
 
         private static void SaveLog(Queue<string> log, string destinationFolder)

@@ -1,10 +1,15 @@
-﻿namespace BackupMaker.Utils
+﻿namespace BackupMaker
 {
     public class Gitignore
     {
-        public static Gitignore Empty { get; } = new Gitignore(Array.Empty<string>());
+        public readonly static Gitignore Empty;
 
         private IEnumerable<string> _excludeList;
+
+        static Gitignore()
+        {
+            Empty = new Gitignore(Array.Empty<string>());
+        }
 
         internal Gitignore(IEnumerable<string> excludeList)
         {
