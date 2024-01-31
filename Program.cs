@@ -125,7 +125,7 @@ namespace BackupMaker
 
         private static string CreateTopLevelFolder(string startFolder, string destinationFolder)
         {
-            string topLevelFolder = Path.GetDirectoryName(startFolder)!;
+            string topLevelFolder = Path.GetFileName(startFolder)!;
             destinationFolder += topLevelFolder;
 
             Directory.CreateDirectory(destinationFolder);
