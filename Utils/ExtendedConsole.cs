@@ -14,6 +14,11 @@
         {
             IsOutputEnabled = true;
         }
+        
+        public static void DisableOutput()
+        {
+            IsOutputEnabled = false;
+        }
 
         public static void EnableLogging()
         {
@@ -22,24 +27,34 @@
 
             IsLoggingEnabled = true;
         }
+        
+        public static void DisableLogging()
+        {
+            _log = null;
+
+            IsLoggingEnabled = false;
+        }
 
         public static void WriteLine(string str)
         {
-            Console.WriteLine(str);
+            if (IsOutputEnabled)
+                Console.WriteLine(str);
 
             _log?.Enqueue(str);
         }
 
         public static void WriteLine()
         {
-            Console.WriteLine();
+            if (IsOutputEnabled)
+                Console.WriteLine();
 
             _log?.Enqueue("");
         }
 
         public static void WriteErrorLine(string err)
         {
-            Console.Error.WriteLine(err);
+            if (IsOutputEnabled)
+                Console.Error.WriteLine(err);
 
             _log?.Enqueue(err);
         }
@@ -65,17 +80,17 @@
             return key;
         }
 
-        public static void OnExit()
+        public static void SaveLog()
         {
             if (_log == null)
                 return;
 
-            Console.WriteLine("Log saving...");
+            WriteLine("Log saving...");
 
             var saveFolder = Directory.GetCurrentDirectory();
             SaveLog(_log, saveFolder);
 
-            Console.WriteLine($"Done. Saved at: {saveFolder}\n");
+            WriteLine($"Done. Saved at: {saveFolder}\n");
         }
 
         private static void SaveLog(Queue<string> log, string destinationFolder)

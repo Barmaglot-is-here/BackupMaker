@@ -1,22 +1,22 @@
 ﻿namespace BackupMaker
 {
-    public class Gitignore
+    public class Ignore
     {
-        public readonly static Gitignore Empty;
+        public readonly static Ignore Empty;
 
         private IEnumerable<string> _excludeList;
 
-        static Gitignore()
+        static Ignore()
         {
-            Empty = new Gitignore(Array.Empty<string>());
+            Empty = new Ignore(Array.Empty<string>());
         }
 
-        internal Gitignore(IEnumerable<string> excludeList)
+        internal Ignore(IEnumerable<string> excludeList)
         {
             _excludeList = excludeList;
         }
 
-        public static Gitignore Parse(string path)
+        public static Ignore Parse(string path)
         {
             Queue<string> excludeList = new Queue<string>();
             excludeList.Enqueue("\\.git");
@@ -35,7 +35,7 @@
 
             reader.Dispose();
 
-            return new Gitignore(excludeList);
+            return new Ignore(excludeList);
         }
 
         public bool IsIgnored(string path)
