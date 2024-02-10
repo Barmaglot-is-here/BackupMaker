@@ -2,7 +2,7 @@
 {
     internal class Command
     {
-        public static string GetPath(string msg, bool createIfDoesntExists)
+        public static string GetPath(string msg, bool canCreateIfDoesntExists)
         {
             while (true)
             {
@@ -11,7 +11,7 @@
                 string path = Console.ReadLine() ?? string.Empty;
 
                 if (!Directory.Exists(path))
-                    if (createIfDoesntExists)
+                    if (canCreateIfDoesntExists)
                     {
                         if (Confirm("directory doesn't exists. Create?"))
                             Directory.CreateDirectory(path);

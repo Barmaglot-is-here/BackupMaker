@@ -24,8 +24,8 @@
 
             using BinaryReader reader = new(File.Open(configPath, FileMode.Open));
 
-            bool enableOutput = reader.ReadBoolean();
-            bool enableLogging = reader.ReadBoolean();
+            bool enableOutput       = reader.ReadBoolean();
+            bool enableLogging      = reader.ReadBoolean();
             bool createTopFolderToo = reader.ReadBoolean();
 
             return new Config(enableOutput, enableLogging, createTopFolderToo);

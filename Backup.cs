@@ -73,7 +73,7 @@ namespace BackupMaker
 
         private static Ignore? GetIgnore(string directory)
         {
-            string path = Path.Combine(directory, ".gitignore");
+            string path = Path.Combine(directory, Ignore.Extension);
 
             return File.Exists(path) ? Ignore.Parse(path) : null;
         }
