@@ -36,7 +36,7 @@ namespace BackupMaker
             if (config.EnableOutput)
                 ExtendedConsole.EnableOutput();
 
-            ExtendedConsole.WriteLine("\nStart");
+            Console.WriteLine("Start");
 
             if (config.EnableLogging)
                 ExtendedConsole.EnableLogging();
@@ -48,7 +48,7 @@ namespace BackupMaker
             if (config.EnableLogging)
                 ExtendedConsole.DisableLogging();
 
-            ExtendedConsole.WriteLine("----------------------------------------------\n");
+            Console.WriteLine("Done\n");
 
             ExtendedConsole.DisableOutput();
         }

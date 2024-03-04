@@ -15,6 +15,11 @@
             CreateTopFolderToo = createTopFolderToo;
         }
 
+        public static Config Default()
+        {
+            return new Config(true, false, true);
+        }
+
         public static Config? Load(string directory)
         {
             string configPath = directory + CONFIG_NAME;
@@ -31,11 +36,18 @@
             return new Config(enableOutput, enableLogging, createTopFolderToo);
         }
 
+        public void Show()
+        {
+            Console.WriteLine($"Enable console output:      {EnableOutput}");
+            Console.WriteLine($"Enable logging:             {EnableLogging}");
+            Console.WriteLine($"Create top level folder:    {CreateTopFolderToo}");
+        }
+
         public void Save(string directory)
         {
             string configPath = directory + CONFIG_NAME;
 
-            using BinaryWriter writer = new(File.Open(configPath, FileMode.CreateNew));
+            using BinaryWriter writer = new(File.Open(configPath, FileMode.OpenOrCreate));
 
             writer.Write(EnableOutput);
             writer.Write(EnableLogging);

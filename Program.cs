@@ -1,11 +1,10 @@
-﻿using BackupMaker.Configuration;
+﻿using System.IO;
+using BackupMaker.Configuration;
 using BackupMaker.Utils;
 
 namespace BackupMaker
 {
-    //Добавить возможность изменить конфигурацию
-    //И откатиться на шаг незад
-    //А потом поковырять Ignore
+    //Поковырять Ignore
     //И сам Backup
     //и с логированием что-нибудь сделать
     internal class Program
@@ -14,7 +13,9 @@ namespace BackupMaker
         {
             EncodingSetter.Set(1251);
 
-            while (true)
+            bool loop = true;
+
+            while (loop)
             {
                 string startFolder          = Command.GetPath("Enter start folder:", false);
                 string destinationFolder    = Command.GetPath("Enter destination folder:", true);
@@ -22,44 +23,58 @@ namespace BackupMaker
 
                 Config config = GetConfig(curentDirectory);
 
-                if (!Command.Confirm("Done. Begin?"))
-                    break;
+                int option = Command.Options("Begin", "Configuration", "Change Paths", 
+                                            "Exit");
 
-                Backup.Make(config, startFolder, destinationFolder);
+                switch (option)
+                {
+                    case 1:
+                        Backup.Make(config, startFolder, destinationFolder);
 
-                if (!Command.Confirm("Done. Backup something else?"))
-                    break;
+                        if (!Command.Confirm("Backup something else?"))
+                            loop = false;
+
+                        break;
+                    case 2:
+                        Console.WriteLine("[Configuration]");
+                        config.Show();
+
+                        int option2 = Command.Options("Change", "Set Defaults", "Back");
+
+                        if (option2 == 1)
+                            config = ConfigurationUtility.ConfigureAndSave(curentDirectory);
+                        else if (option2 == 2)
+                            config = ConfigurationUtility.ResetAndSave(curentDirectory);
+                        else
+                            continue;
+
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        loop = false;
+
+                        break;
+                }
             }
         }
 
         private static Config GetConfig(string directory)
         {
             Config? configOrNull = Config.Load(directory);
-            Config config;
 
-            if (configOrNull != null)
+            if (configOrNull == null)
             {
-                config = (Config)configOrNull;
+                Console.WriteLine("Configuration doesn't exist");
 
-                Console.WriteLine("\n[Configuration]");
-                ShowConfigContent(config);
-                Console.WriteLine();
+                int option = Command.Options("Configure", "Set Defaults");
+
+                return option == 1  ? ConfigurationUtility.ConfigureAndSave(directory) 
+                                    : ConfigurationUtility.ResetAndSave(directory);
             }
             else
-            {
-                config = ConfigurationUtility.Congfigure();
-
-                config.Save(directory);
-            }
-
-            return config;
+                return (Config)configOrNull;
         }
 
-        private static void ShowConfigContent(Config config)
-        {
-            Console.WriteLine($"Enable console output:      {config.EnableOutput}");
-            Console.WriteLine($"Enable logging:             {config.EnableLogging}");
-            Console.WriteLine($"Create top level folder:    {config.CreateTopFolderToo}");
-        }
     }
 }
