@@ -1,57 +1,59 @@
-﻿namespace BackupMaker.Configuration
+﻿namespace BackupMaker.Configuration;
+
+internal struct Config
 {
-    internal struct Config
+    private const string CONFIG_NAME = "config.bin";
+
+    public bool EnableOutput { get; set; }
+    public bool CreateTopFolderToo { get; set; }
+
+    public static Config Default
     {
-        private const string CONFIG_NAME = "config.bin";
-
-        public bool EnableOutput { get; }
-        public bool EnableLogging { get; }
-        public bool CreateTopFolderToo { get; }
-
-        public Config(bool enableOutput, bool enableLogging, bool createTopFolderToo)
+        get
         {
-            EnableOutput = enableOutput;
-            EnableLogging = enableLogging;
-            CreateTopFolderToo = createTopFolderToo;
+            Config config               = new();
+            config.EnableOutput         = true;
+            config.CreateTopFolderToo   = true;
+
+            return config;
         }
+    }
 
-        public static Config Default()
-        {
-            return new Config(true, false, true);
-        }
+    public static bool TryLoad(string directory, out Config config)
+    {
+        string configPath   = directory + CONFIG_NAME;
+        bool exists         = File.Exists(configPath);
 
-        public static Config? Load(string directory)
-        {
-            string configPath = directory + CONFIG_NAME;
+        config = exists ? Load(configPath) : default;
 
-            if (!File.Exists(configPath))
-                return null;
+        return exists;
+    }
 
-            using BinaryReader reader = new(File.Open(configPath, FileMode.Open));
+    public static Config Load(string path)
+    {
+        using BinaryReader reader = new(File.Open(path, FileMode.Open));
 
-            bool enableOutput       = reader.ReadBoolean();
-            bool enableLogging      = reader.ReadBoolean();
-            bool createTopFolderToo = reader.ReadBoolean();
+        Config config               = new();
+        config.EnableOutput         = reader.ReadBoolean();
+        config.CreateTopFolderToo   = reader.ReadBoolean();
 
-            return new Config(enableOutput, enableLogging, createTopFolderToo);
-        }
+        return config;
+    }
 
-        public void Show()
-        {
-            Console.WriteLine($"Enable console output:      {EnableOutput}");
-            Console.WriteLine($"Enable logging:             {EnableLogging}");
-            Console.WriteLine($"Create top level folder:    {CreateTopFolderToo}");
-        }
+    public void Save(string directory)
+    {
+        string configPath = directory + CONFIG_NAME;
 
-        public void Save(string directory)
-        {
-            string configPath = directory + CONFIG_NAME;
+        using BinaryWriter writer = new(File.Open(configPath, FileMode.OpenOrCreate));
 
-            using BinaryWriter writer = new(File.Open(configPath, FileMode.OpenOrCreate));
+        writer.Write(EnableOutput);
+        writer.Write(CreateTopFolderToo);
+    }
 
-            writer.Write(EnableOutput);
-            writer.Write(EnableLogging);
-            writer.Write(CreateTopFolderToo);
-        }
+    public void Show()
+    {
+        Console.WriteLine("[Configuration]");
+        Console.WriteLine($"Enable console output:      {EnableOutput}");
+        Console.WriteLine($"Create top level folder:    {CreateTopFolderToo}");
     }
 }

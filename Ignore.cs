@@ -1,42 +1,40 @@
-﻿namespace BackupMaker
+﻿namespace BackupMaker;
+
+public class Ignore
 {
-    public class Ignore
+    public readonly static Ignore Empty;
+    public readonly static string Extension = ".ignore";
+
+    private readonly IEnumerable<string> _excludeList;
+
+    static Ignore()
     {
-        public readonly static Ignore Empty;
-        public readonly static string Extension = ".ignore";
+        Empty = new Ignore(Array.Empty<string>());
+    }
 
-        private IEnumerable<string> _excludeList;
+    internal Ignore(IEnumerable<string> excludeList)
+    {
+        _excludeList = excludeList;
+    }
 
-        static Ignore()
-        {
-            Empty = new Ignore(Array.Empty<string>());
-        }
+    public static Ignore Parse(string path)
+    {
+        Queue<string> excludeList = new();
+        using StreamReader reader = new(path);
 
-        internal Ignore(IEnumerable<string> excludeList)
-        {
-            _excludeList = excludeList;
-        }
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+            excludeList.Enqueue(line);
 
-        public static Ignore Parse(string path)
-        {
-            Queue<string> excludeList = new Queue<string>();
+        return new Ignore(excludeList);
+    }
 
-            using StreamReader reader = new StreamReader(path);
+    public bool IsIgnored(string path)
+    {
+        foreach (string exclude in _excludeList)
+            if (path.EndsWith(exclude))
+                return true;
 
-            string? line;
-            while ((line = reader.ReadLine()) != null)
-                excludeList.Enqueue(line);
-
-            return new Ignore(excludeList);
-        }
-
-        public bool IsIgnored(string path)
-        {
-            foreach (string exclude in _excludeList)
-                if (path.EndsWith(exclude))
-                    return true;
-
-            return false;
-        }
+        return false;
     }
 }

@@ -1,36 +1,16 @@
 ﻿using System.Text;
 
-namespace BackupMaker.Utils
+namespace BackupMaker.Utils;
+
+public static class EncodingSetter
 {
-    public static class EncodingSetter
+    static EncodingSetter() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+    public static void Set(int codepage)
     {
-        public enum Type
-        {
-            Input,
-            Output,
-        }
+        Encoding encoding = Encoding.GetEncoding(codepage);
 
-        static EncodingSetter()
-        {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        }
-
-        public static void Set(int codepage)
-        {
-            Encoding encoding = Encoding.GetEncoding(codepage);
-
-            Console.OutputEncoding = encoding;
-            Console.InputEncoding = encoding;
-        }
-
-        public static void Set(int codepage, Type type)
-        {
-            Encoding encoding = Encoding.GetEncoding(codepage);
-
-            if (type == Type.Output)
-                Console.OutputEncoding = encoding;
-            else
-                Console.InputEncoding = encoding;
-        }
+        Console.OutputEncoding  = encoding;
+        Console.InputEncoding   = encoding;
     }
 }
