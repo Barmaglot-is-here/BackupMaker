@@ -17,10 +17,10 @@ public class Ignore
         _excludeList = excludeList;
     }
 
-    public static Ignore Parse(string path)
+    public static Ignore Parse(string file)
     {
         Queue<string> excludeList = new();
-        using StreamReader reader = new(path);
+        using StreamReader reader = new(file);
 
         string? line;
         while ((line = reader.ReadLine()) != null)

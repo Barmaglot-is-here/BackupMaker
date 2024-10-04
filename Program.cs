@@ -5,19 +5,18 @@ namespace BackupMaker;
 
 internal class Program
 {
-    private const int RU_ENCODING = 1251;
-
     static void Main()
     {
-        EncodingSetter.Set(RU_ENCODING);
+        EncodingSetter.Set(EncodingSetter.RU_ENCODING);
 
-        bool loop = true;
+        string curentDirectory  = Directory.GetCurrentDirectory();
+        bool loop               = true;
 
         while (loop)
         {
             string startFolder          = Command.GetPath("Enter start folder:", false);
             string destinationFolder    = Command.GetPath("Enter destination folder:", true);
-            string curentDirectory      = Directory.GetCurrentDirectory();
+            
 
             Config config = ConfigurationUtility.GetConfig(curentDirectory);
 
@@ -54,5 +53,8 @@ internal class Program
                     throw new NotImplementedException();
             }
         }
+
+        if (!Loger.IsEmpty)
+            Loger.Save(curentDirectory);
     }
 }

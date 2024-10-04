@@ -4,6 +4,8 @@ namespace BackupMaker.Utils;
 
 public static class EncodingSetter
 {
+    public const int RU_ENCODING = 1251;
+
     static EncodingSetter() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
     public static void Set(int codepage)

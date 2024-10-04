@@ -16,4 +16,9 @@
     <None Remove="Publish\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove=".gitignore" />
+    <None Remove="Publishconfig.bin" />
+  </ItemGroup>
+
 </Project>

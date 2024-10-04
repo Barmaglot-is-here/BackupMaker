@@ -6,6 +6,7 @@ internal struct Config
 
     public bool EnableOutput { get; set; }
     public bool CreateTopFolderToo { get; set; }
+    public bool EnableLoging { get; set; }
 
     public static Config Default
     {
@@ -14,6 +15,7 @@ internal struct Config
             Config config               = new();
             config.EnableOutput         = true;
             config.CreateTopFolderToo   = true;
+            config.EnableLoging         = false;
 
             return config;
         }
@@ -21,7 +23,7 @@ internal struct Config
 
     public static bool TryLoad(string directory, out Config config)
     {
-        string configPath   = directory + CONFIG_NAME;
+        string configPath   = GetConfigPath(directory);
         bool exists         = File.Exists(configPath);
 
         config = exists ? Load(configPath) : default;
@@ -36,24 +38,29 @@ internal struct Config
         Config config               = new();
         config.EnableOutput         = reader.ReadBoolean();
         config.CreateTopFolderToo   = reader.ReadBoolean();
+        config.EnableLoging         = reader.ReadBoolean();
 
         return config;
     }
 
     public void Save(string directory)
     {
-        string configPath = directory + CONFIG_NAME;
+        string savePath = GetConfigPath(directory);
 
-        using BinaryWriter writer = new(File.Open(configPath, FileMode.OpenOrCreate));
+        using BinaryWriter writer = new(File.Open(savePath, FileMode.OpenOrCreate));
 
         writer.Write(EnableOutput);
         writer.Write(CreateTopFolderToo);
+        writer.Write(EnableLoging);
     }
+
+    private static string GetConfigPath(string directory) => Path.Combine(directory, CONFIG_NAME);
 
     public void Show()
     {
         Console.WriteLine("[Configuration]");
         Console.WriteLine($"Enable console output:      {EnableOutput}");
         Console.WriteLine($"Create top level folder:    {CreateTopFolderToo}");
+        Console.WriteLine($"Enable loging:              {EnableLoging}");
     }
 }

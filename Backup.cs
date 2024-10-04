@@ -4,8 +4,6 @@ namespace BackupMaker;
 
 internal static class Backup
 {
-    private static bool _enableConsoleOutput;
-
     private static bool _owerwritingConfirmed;
     private static bool _isOverwritingAllowed;
 
@@ -17,14 +15,16 @@ internal static class Backup
             {
                 _owerwritingConfirmed = true;
 
-                Console.WriteLine();
+                Write();
                 _isOverwritingAllowed = Command.Confirm("Directory contains duplicate files. Allow owerwriting?");
-                Console.WriteLine();
+                Write();
             }
 
             return _isOverwritingAllowed;
         }
     }
+
+    private static WriteDelegate Write;
 
     public static void Make(Config config, string startFolder, string destinationFolder)
     {
@@ -32,13 +32,11 @@ internal static class Backup
             ? CreateTopLevelFolder(startFolder, destinationFolder)
             : destinationFolder;
 
-        _enableConsoleOutput = config.EnableOutput;
+        Write = WritingConfigurationUtility.GetWriteFunction(config);
 
-        Console.WriteLine("Start");
-
+        Write("Start");
         DeepCopy(startFolder, destinationFolder, Ignore.Empty);
-
-        Console.WriteLine("Done\n");
+        Write("Done\n");
     }
 
     private static string CreateTopLevelFolder(string startFolder, string destinationFolder)
@@ -72,7 +70,7 @@ internal static class Backup
         {
             if (ignore.IsIgnored(file))
             {
-                WriteLine(file + " --ignored");
+                Write(file + " --ignored");
 
                 continue;
             }
@@ -85,16 +83,16 @@ internal static class Backup
                 {
                     File.Copy(file, finalPath, true);
 
-                    WriteLine(file + " --overwrited");
+                    Write(file + " --overwrited");
                 }
                 else
-                    WriteLine(file + " --skiped");
+                    Write(file + " --skiped");
             }
             else
             {
                 File.Copy(file, finalPath);
 
-                WriteLine(file);
+                Write(file);
             }
         }
     }
@@ -105,7 +103,7 @@ internal static class Backup
         {
             if (ignore.IsIgnored(subdirectory))
             {
-                WriteLine(subdirectory + " --ignored");
+                Write(subdirectory + " --ignored");
 
                 continue;
             }
@@ -114,16 +112,10 @@ internal static class Backup
 
             Directory.CreateDirectory(finalPath);
 
-            WriteLine(subdirectory);
+            Write(subdirectory);
 
             DeepCopy(subdirectory, finalPath, ignore);
         }
-    }
-
-    private static void WriteLine(string msg)
-    {
-        if (_enableConsoleOutput)
-            Console.WriteLine(msg);
     }
 
     private static string GetFinalPath(string currentPath, string destinationFolder)
