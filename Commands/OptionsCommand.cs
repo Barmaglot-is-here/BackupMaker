@@ -19,16 +19,33 @@ internal partial class Command
 
             Console.WriteLine();
 
-            var keyInfo = Console.ReadKey(true);
-            int keyIndex = KeyToInt(keyInfo.Key);                
+            int key = Console.IsInputRedirected ? GetKeyFromFile() : GetKeyFromConsole();
 
-            if (keyIndex == -1 || keyIndex > options.Length)
+            if (key == -1 || key > options.Length)
                 Console.WriteLine("Wrong key");
             else
-                return keyIndex;
+                return key;
         }
     }
 
+    private static int GetKeyFromFile()
+    {
+        var input = Console.ReadLine();
+
+        if (!int.TryParse(input, out int key))
+            return -1;
+        else
+            return key;
+    }
+
+    private static int GetKeyFromConsole()
+    {
+        var keyInfo = Console.ReadKey(true);
+        int key     = KeyToInt(keyInfo.Key);
+
+        return key;
+    }
+    
     private static int KeyToInt(ConsoleKey consoleKey)
     {
         int keyIndex = (int)consoleKey;

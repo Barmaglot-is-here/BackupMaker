@@ -11,14 +11,50 @@ internal partial class Command
         {
             Console.WriteLine($"{msg} [{CONFIRM_KEY}/{DECLINE_KEY}]");
 
-            var keyInfo = Console.ReadKey(true);
+            var succes = Console.IsInputRedirected 
+                ? TryConfirmFromFile(out bool result) 
+                : TryConfirmFromConsole(out result);
 
-            if (keyInfo.Key == CONFIRM_KEY)
-                return true;
-            else if (keyInfo.Key == DECLINE_KEY)
-                return false;
-
-            Console.WriteLine("Wrong key");
+            if (!succes)
+                Console.WriteLine("Wrong key");
+            else
+                return result;
         }
+    }
+
+    private static bool TryConfirmFromConsole(out bool result)
+    {
+        var keyInfo = Console.ReadKey(true);
+
+        if (keyInfo.Key == CONFIRM_KEY)
+            result = true;
+        else if (keyInfo.Key == DECLINE_KEY)
+            result = false;
+        else
+        {
+            result = false;
+
+            return false;
+        }
+
+        return true;
+    }
+    
+    private static bool TryConfirmFromFile(out bool result)
+    {
+        var input   = Console.ReadLine();
+
+        if (input == "n" || input == "N")
+            result = false;
+        else if (input == "y" || input == "Y")
+            result = true;
+        else
+        {
+            result = false;
+
+            return false;
+        }
+
+        return true;
     }
 }

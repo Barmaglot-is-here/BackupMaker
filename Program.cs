@@ -9,20 +9,18 @@ internal class Program
     {
         EncodingSetter.Set(EncodingSetter.RU_ENCODING);
 
-        string curentDirectory  = Directory.GetCurrentDirectory();
-        bool loop               = true;
+        string curentDirectory = Directory.GetCurrentDirectory();
+        bool loop = true;
 
         while (loop)
         {
             string startFolder          = Command.GetPath("Enter start folder:", false);
             string destinationFolder    = Command.GetPath("Enter destination folder:", true);
-            
 
             Config config = ConfigurationUtility.GetConfig(curentDirectory);
 
-            OptionsSelect:
-            int option = Command.Options("Begin", "Configuration", "Back", 
-                                        "Exit");
+        OptionsSelect:
+            int option = Command.Options("Begin", "Configuration", "Back", "Exit");
 
             switch (option)
             {
