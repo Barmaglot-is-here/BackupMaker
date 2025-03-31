@@ -7,6 +7,7 @@ internal static class ConfigurationUtility
         Config config               = new();
         config.EnableOutput         = Command.Confirm("Enable console output?");
         config.CreateTopFolderToo   = Command.Confirm("Create top level folder?");
+        config.EnableLoging         = Command.Confirm("Enable logging?");
 
         return config;
     }
